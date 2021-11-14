@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import createApiClient from "../../api/api-client-factory";
@@ -18,6 +18,16 @@ const Admin = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [sucessMsg, setSuccessMsg] = useState("");
   const { addNotification, removeLastNotification } = useApp();
+
+  let timeoutId: number | null = null;
+
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+   }, [timeoutId]);
 
   async function postProject(event: FormEvent<HTMLFormElement>) {
     dismissError();
@@ -41,7 +51,7 @@ const Admin = () => {
       await api.postProject(project);
       resetForm();
       setSuccessMsg(t("admin.suc_network"));
-      setTimeout(() => {setSuccessMsg("")}, 2000);
+      timeoutId = setTimeout(() => {setSuccessMsg("")}, 2000);
     } catch (e) {
       setErrorMsg(t("admin.err_network"));
     } finally {
