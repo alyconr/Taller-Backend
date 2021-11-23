@@ -19,7 +19,7 @@ const Admin = () => {
   const [sucessMsg, setSuccessMsg] = useState("");
   const { addNotification, removeLastNotification } = useApp();
 
-  let timeoutId: number | null = null;
+  let timeoutId: any | null = null;
 
   useEffect(() => {
     return () => {
