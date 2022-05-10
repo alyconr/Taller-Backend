@@ -1,4 +1,4 @@
-# Contributin
+# Contributing
 
 Contributing explica como configurar los requerimientos del projecto
 

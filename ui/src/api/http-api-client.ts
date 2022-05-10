@@ -101,7 +101,7 @@ export default class HttpApiClient implements ApiClient {
         {
           method: "GET",
           headers: {
-            Authorization: getAuthorizationHeader()
+            //Authorization: getAuthorizationHeader()
           }
         }
       );
@@ -118,7 +118,7 @@ export default class HttpApiClient implements ApiClient {
         {
           method: "GET",
           headers: {
-            Authorization: getAuthorizationHeader()
+            //Authorization: getAuthorizationHeader()
           }
         }
       );
