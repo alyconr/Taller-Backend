@@ -6,12 +6,13 @@ import ApiClient, {
   NotFound,
   PreconditionFailed,
   PreconditionRequired,
+  ProjectResponse,
   TokenResponse,
   Unauthorized,
   UnprocessableEntity,
 } from "./api-client";
 
-import { removeAuthToken } from "../utils/auth";
+import { getAccessToken, removeAuthToken } from "../utils/auth";
 import { Project } from "../model/project";
 import { AboutMe } from "../model/aboutme";
 
@@ -62,14 +63,14 @@ const handleResponse = async <T>(func: () => Promise<T>): Promise<T> => {
 };
 
 // TODO: Uncomment to use it with auth
-// const getAuthorizationHeader = () => {
-//   const accessToken = getAccessToken();
-//   if (accessToken) {
-//     return "Bearer " + accessToken;
-//   } else {
-//     throw new Unauthorized();
-//   }
-// };
+ const getAuthorizationHeader = () => {
+  const accessToken = getAccessToken();
+   if (accessToken) {
+    return "Bearer " + accessToken;
+   } else {
+     throw new Unauthorized();
+   }
+ };
 
 export default class HttpApiClient implements ApiClient {
   baseUrl: string;
@@ -101,7 +102,8 @@ export default class HttpApiClient implements ApiClient {
         {
           method: "GET",
           headers: {
-            //Authorization: getAuthorizationHeader()
+            "Content-Type": "application/json",
+            "Authorization": getAuthorizationHeader()
           }
         }
       );
@@ -118,7 +120,9 @@ export default class HttpApiClient implements ApiClient {
         {
           method: "GET",
           headers: {
-            //Authorization: getAuthorizationHeader()
+            "Content-Type": "application/json",
+            "Authorization": getAuthorizationHeader()
+
           }
         }
       );
@@ -128,14 +132,27 @@ export default class HttpApiClient implements ApiClient {
       return response.json();
     });
 
-    /** TODO: Create post for Proyect creation with authentication
-     * Hint: Headers of the post should be
-     * headers: {
-          Authorization: getAuthorizationHeader(),
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+  postProject = (project: Project): Promise<ProjectResponse> =>
+    
+    handleResponse(async () => {
+      const response = await fetch(
+        this.baseUrl + `/v1/projects/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorizationHeader(),
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(project)
         }
-     * 
-     */
-  
-}
+      );
+      if (!response.ok) {
+        throw await createApiError(response);
+      }
+      return response.json();
+    }
+    );
+  }
+
+

@@ -4,6 +4,10 @@ import styled from "styled-components";
 import useApp from "../../hooks/useApp";
 import { themes } from "../../styles/ColorStyles";
 import { Caption, H1 } from "../../styles/TextStyles";
+import createApiClient from "../../api/api-client-factory";
+import { Project } from "../../model/project";
+import { PUSH_NOTIFICATION } from './../../context/AppContext/constants';
+import { read } from "fs";
 
 const Admin = () => {
   const { t } = useTranslation();
@@ -17,37 +21,67 @@ const Admin = () => {
   const [sucessMsg, setSuccessMsg] = useState("");
   const { addNotification, removeLastNotification } = useApp();
 
-  async function postProject(event: FormEvent<HTMLFormElement>) {
-    dismissError();
+  let timeoutId: any = null;
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }
+  , [timeoutId]);
+
+
+  async function postProject(event: FormEvent < HTMLFormElement > ) {
     event.preventDefault();
+    dismissError();
     if (!readyToSubmit()) {
-      setErrorMsg(t("admin.err_invalid_form"));
+      setErrorMsg(t("error.missingFields"));
       return;
     }
+    const apiClient = createApiClient();
+   
     try {
-      console.log(title);
-      console.log(description);
-      console.log(tags);
-      console.log(version);
-      console.log(link);
-      // TODO: Create Proyect Object and post (HINT, there a generateUUID helper method)
-      addNotification("Posting...");
+      const project: Project = {
+        id: generateUUID(),
+        title: title,
+        description: description,
+        link: link,
+        tag: tags,
+        version: version,
+        timestamp: new Date().getTime(),
+      };
+      addNotification ("POSTING PROJECT");
+      await apiClient.postProject(project);
       resetForm();
-      setSuccessMsg(t("admin.suc_network"));
-      setTimeout(() => {setSuccessMsg("")}, 2000);
-    } catch (e) {
-      setErrorMsg(t("admin.err_network"));
-    } finally {
-      removeLastNotification();
+      setSuccessMsg("SUCCESS PROJECT POSETED");
+      timeoutId = setTimeout(() => {
+        removeLastNotification();
+      }
+      , 1000);
+    } catch (error) {
+      addNotification ("ERROR POSTING PROJECT");
+      setErrorMsg(t("error.projectPostFailed"));
+      timeoutId = setTimeout(() => {
+        removeLastNotification();
+      }
+      , 3000);
     }
   }
 
-  // TODO: Use it to generete uid
-  // function generateUUID(): string {
-  //   return Math.floor((1 + Math.random()) * 0x100000000000)
-  //   .toString(16)
-  //   .substring(1);
-  // }
+
+
+
+
+
+
+
+ function generateUUID(): string {
+   return Math.floor((1 + Math.random()) * 0x100000000000)
+   .toString(16)
+    .substring(1);
+   }
 
   function resetForm() {
     setErrorMsg("");

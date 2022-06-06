@@ -41,6 +41,10 @@ const ProjectsService: IProjectsService = {
         try {
             // TODO: Log the project to be created
 
+            await MockProjects.push(body);
+              
+           
+            
             return MockProjects[0];
         } catch (error) {
             throw new Error(error.message);
