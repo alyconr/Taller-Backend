@@ -14,7 +14,7 @@ export default function createApiClient(): ApiClient {
     if (API_BASE_URI !== undefined) {
       return new HttpApiClient(API_BASE_URI);
     } else {
-      return new HttpApiClient("http://localhost:3500");
+      return new HttpApiClient("https://node-aly-portfolio.herokuapp.com/");
     }
   }
 }
